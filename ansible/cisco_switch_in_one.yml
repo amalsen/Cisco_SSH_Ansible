@@ -1,0 +1,13 @@
+---
+- name: Switch configuration inbound 1
+  hosts: cisco_switch_in_one
+
+  tasks:
+  - name: Creating VLANs
+    cisco.ios.ios_vlans:
+      config:
+        - name: VLAN20
+          vlan_id: 20
+          state: active
+          shutdown: disabled
+      state: merged

@@ -1,0 +1,60 @@
+---
+- name: Router configuration 1
+  hosts: cisco_router_one
+
+  tasks:
+  - name: GigabitEthernet0/0/0.22
+    cisco.ios.ios_config:
+      lines:
+        - encapsulation dot1Q 22
+        - ip address 192.168.22.254 255.255.255.0
+        - standby 20 ip 192.168.22.1
+        - standpy 20 track GigabitEthernet0/0/1
+      parents: interface GigabitEthernet0/0/0.22
+
+  - name: GigabitEthernet0/0/0.20
+    cisco.ios.ios_config:
+      lines:
+        - encapsulation dot1Q 20
+        - ip address 192.168.20.254 255.255.255.0
+        - standby 22 ip 192.168.20.1
+        - standpy 22 track GigabitEthernet0/0/1
+      parents: interface GigabitEthernet0/0/0.20
+
+  - name: GigabitEthernet0/0/1.22
+    cisco.ios.ios_config:
+      lines:
+        - encapsulation dot1Q 22
+        - ip address 172.16.22.254 255.255.255.0
+        - standby 21 ip 172.16.22.1
+        - standpy 21 track GigabitEthernet0/0/0
+      parents: interface GigabitEthernet0/0/1.22
+
+  - name: GigabitEthernet0/0/1.20
+    cisco.ios.ios_config:
+      lines:
+        - encapsulation dot1Q 20
+        - ip address 172.16.20.254 255.255.255.0
+        - standby 23 ip 172.16.20.1
+        - standpy 23 track GigabitEthernet0/0/0
+      parents: interface GigabitEthernet0/0/1.20
+
+  - name: GigabitEthernet0/0/1
+    cisco.ios.ios_config:
+      lines:
+        - no shutdown
+      parents: interface GigabitEthernet0/0/1
+
+  - name: Configure DHCP
+    cisco.ios.ios_config:
+      lines:
+        - network 172.16.20.0 255.255.255.0
+        - default-router 172.16.20.1
+        - dns-server 172.16.20.1
+      parents: ip dhcp pool 1
+  
+  - name: Exclution DHCP
+    cisco.ios.ios_config:
+      lines:
+        - ip dhcp excluded-address 172.16.20.1 172.16.20.100
+        - ip dhcp excluded-address 172.16.20.151 172.16.20.254
